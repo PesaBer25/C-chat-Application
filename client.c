@@ -18,8 +18,8 @@ int main(void){
     SOCKET socket_fd = socket(AF_INET,SOCK_STREAM,0);
     struct sockaddr_in address;
     address.sin_family = AF_INET;
-    address.sin_port = htons(80);
-    address.sin_addr.s_addr = inet_addr("172.217.170.174");
+    address.sin_port = htons(2000);
+    address.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     if(connect(socket_fd,(struct sockaddr *)&address,sizeof(address)) == SOCKET_ERROR){
         printf("Connection Failed\n");
@@ -33,8 +33,11 @@ int main(void){
     }else{
         printf("Not Sent\n");
     }
-    if(recv(socket_fd,response,sizeof(response),0) != INVALID_SOCKET)
+    int len = recv(socket_fd,response,1024,0);
+    if(len > 0){
+        response[len] = '\0';
         printf("The response was: \n%s",response);
+    }
     
     closesocket(socket_fd);
     stop();
