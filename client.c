@@ -33,8 +33,10 @@ int main(void){
     }else{
         printf("Not Sent\n");
     }
-    if(recv(socket_fd,response,sizeof(response),0) != INVALID_SOCKET){
+    if(recv(socket_fd,response,sizeof(response),0) != INVALID_SOCKET)
         printf("The response was: \n%s",response);
-    }
+    
+    closesocket(socket_fd);
+    stop();
     return 0;
 }
