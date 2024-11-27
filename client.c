@@ -25,6 +25,7 @@ int main(void){
         printf("Connection Failed\n");
         closesocket(socket_fd);
         stop();
+        return 1;
     }
     char * get_request = "GET / HTTP/1.1\r\nhost:google.com\r\n\r\n";
     char response[1024];

@@ -23,11 +23,22 @@ int main(void){
     server_address.sin_port = htons(2000);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
-    if(bind(server_socket_fd,(struct sockaddr *)&server_address,sizeof(server_address)) != SOCKET_ERROR)
+    if(bind(server_socket_fd,(struct sockaddr *)&server_address,sizeof(server_address)) != SOCKET_ERROR){
         printf("Server Bound successfully\n");
+    }else{
+        printf("Server bound failure\n");
+        closesocket(server_socket_fd);
+        stop();
+        return 1;
+    }
+        
     
-    if(listen(server_socket_fd,10) != SOCKET_ERROR)
+    if(listen(server_socket_fd,10) != SOCKET_ERROR){
         printf("Server Listening on port %d\n",ntohs(server_address.sin_port));
+    }else{
+        printf("Server listening failed\n");
+    }
+        
 
     int address_size =  sizeof(client_address);
     if((client_socket_fd = accept(server_socket_fd,(struct sockaddr*)&client_address,&address_size)) != INVALID_SOCKET){
@@ -41,7 +52,11 @@ int main(void){
         request[len] = '\0';
         printf("Client Says:\n\t%s",request);
     }
-    send(client_socket_fd,response,strlen(response),0);
+    if(send(client_socket_fd,response,strlen(response),0) != SOCKET_ERROR){
+        printf("Response sent successfully\n");
+    }else{
+        printf("response not sent\n");
+    }
     closesocket(client_socket_fd);
     closesocket(server_socket_fd);
     stop();
