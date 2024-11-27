@@ -26,20 +26,31 @@ int main(void){
         closesocket(socket_fd);
         stop();
         return 1;
-    }
-    char * get_request = "GET / HTTP/1.1\r\nhost:google.com\r\n\r\n";
-    char response[1024];
-    if(send(socket_fd,get_request,strlen(get_request),0) != INVALID_SOCKET){
-        printf("Sent success\n");
     }else{
-        printf("Not Sent\n");
+        printf("Connected successfully\n");
     }
-    int len = recv(socket_fd,response,1024,0);
-    if(len > 0){
-        response[len] = '\0';
-        printf("The response was: \n%s",response);
-    }
+    char message[1024];
+    char response[1024];
+    while(1){
+        printf("\nType message (Q to quit): ");
+        fgets(message,1024,stdin);
+        if(strcmp("Q\n",message) == 0 || strcmp("q\n",message) == 0){
+            break;
+        }
+        if(send(socket_fd,message,strlen(message),0) != INVALID_SOCKET){
+            printf("Sent success\n");
+        }else{
+            printf("Not Sent\n");
+            printf("Server Down\n");
+        }
+        int len = recv(socket_fd,response,1024,0);
+        if(len > 0){
+            response[len] = '\0';
+            printf("The response was: \n%s",response);
+         }
     
+    }
+  
     closesocket(socket_fd);
     stop();
     return 0;
