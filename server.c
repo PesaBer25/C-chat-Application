@@ -41,22 +41,58 @@ int main(void){
         
 
     int address_size =  sizeof(client_address);
-    if((client_socket_fd = accept(server_socket_fd,(struct sockaddr*)&client_address,&address_size)) != INVALID_SOCKET){
-        printf("Client connected\n");
-    }
+    
     char request[1024];
     char *response =  "Hello from server";
+    fd_set set;
+    int max = server_socket_fd;
 
-    int len = recv(client_socket_fd,request,1024,0);
-    if(len > 0){
-        request[len] = '\0';
-        printf("Client Says:\n\t%s",request);
+    FD_ZERO(&set);
+    FD_SET(server_socket_fd,&set);
+
+    while(1){
+        fd_set temp = set;
+
+        if(select(max + 1,&temp,NULL,NULL,NULL) == SOCKET_ERROR){
+            continue;
+        }
+
+        if(FD_ISSET(server_socket_fd,&temp)){
+            if((client_socket_fd = accept(server_socket_fd,(struct sockaddr*)&client_address,&address_size)) == INVALID_SOCKET){
+                continue;
+            }else{
+                printf("Client Connected\n");
+            }
+            FD_SET(client_socket_fd,&set);
+            if(client_socket_fd > max){
+                max = client_socket_fd;
+                continue;
+            }
+        }
+
+        for(int i = 0; i <= max; i++){
+            if(FD_ISSET(i,&temp)){
+                if(i == server_socket_fd)
+                    continue;
+                int len = recv(i,request,1024,0);
+                if(len > 0){
+                    request[len] = '\0';
+                    printf("Client Says:\n\t%s",request);
+                    if(send(i,response,strlen(response),0) != SOCKET_ERROR){
+                         printf("Response sent successfully\n");
+                    }else{
+                         printf("response not sent\n");
+                    }
+                }else{
+                    printf("Client disconnected\n");
+                    closesocket(i);
+                    FD_CLR(i,&set);
+                }
+            }
+        }
     }
-    if(send(client_socket_fd,response,strlen(response),0) != SOCKET_ERROR){
-        printf("Response sent successfully\n");
-    }else{
-        printf("response not sent\n");
-    }
+
+
     closesocket(client_socket_fd);
     closesocket(server_socket_fd);
     stop();
