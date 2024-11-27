@@ -27,10 +27,26 @@ int main(void){
         stop();
         return 1;
     }else{
-        printf("Connected successfully\n");
+        char * welcome = "\tWelcome to Console chat room\nSet username to start chatting:->";
+        for(int i = 0; i < strlen(welcome); i++){
+            printf("%c",welcome[i]);
+            Sleep(100);
+        }
     }
     char message[1024];
+    char name[100] = "/";
     char response[1024];
+    do{
+        printf("\nEnter username: ");
+        fgets(message,1024,stdin);
+    }while(strlen(message) == 1);
+    strcat(name,message);
+    if(send(socket_fd,name,strlen(name),0) != INVALID_SOCKET){
+            recv(socket_fd,response,1024,0);
+            if(!strcmp("set",response)){
+                printf("\nUsername set: Enjoy %s\n",name);
+            }
+        }
     while(1){
         printf("\nType message (Q to quit): ");
         fgets(message,1024,stdin);
