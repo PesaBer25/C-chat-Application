@@ -23,6 +23,7 @@ int main(void){
     server_address.sin_port = htons(2000);
     server_address.sin_addr.s_addr = INADDR_ANY;
 
+
     if(bind(server_socket_fd,(struct sockaddr *)&server_address,sizeof(server_address)) != SOCKET_ERROR){
         printf("Server Bound successfully\n");
     }else{
@@ -75,6 +76,10 @@ int main(void){
                 if(i == server_socket_fd)
                     continue;
                 int len = recv(i,request,1024,0);
+                if(request[0] == '/'){
+                    send(i,"set",sizeof("set"),0);
+                    continue;
+                } 
                 if(len > 0){
                     request[len] = '\0';
                     printf("Client Says:\n\t%s",request);
@@ -91,9 +96,6 @@ int main(void){
             }
         }
     }
-
-
-    closesocket(client_socket_fd);
     closesocket(server_socket_fd);
     stop();
 
